@@ -1,0 +1,23 @@
+includes:
+  - layer:basic
+defines:
+  users:
+    type: array
+    default: []
+    description: "List of users to create. Groups with the same name will be created."
+  uidmap:
+    type: array
+    default: []
+    description: "Ensure the provided users, have the UID specified after '='. e.g. ubuntu=1000, storage=1001"
+  groups:
+    type: array
+    default: []
+    description: "List of groups to create. User accounts will not be created"
+  gidmap:
+    type: array
+    default: []
+    description: "Ensure the provided groups, have the GID specified after '='. e.g. ubuntu=1000,storage=1001"
+  membership:
+    type: array
+    default: []
+    description: "Ensure the users provided, are members of the provided groups, colon separated, following '='. e.g. ubuntu=sudo:wheel, storage=storage,sudo"
