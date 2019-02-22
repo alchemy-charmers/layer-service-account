@@ -209,7 +209,6 @@ class ServiceAccountHelper():
         config_membership = self.charm_config['system-group-membership']
         layer_membership = self.layer_config['membership']
 
-
     def process_user_accounts(self):
 
     def process_groups(self):
