@@ -1,0 +1,21 @@
+options:
+  system-additional-users:
+    type: string
+    default: ""
+    description: "Comma separated list of users to create. Groups with the same name will be created."
+  system-uidmap:
+    type: string
+    default: ""
+    description: "Ensure the provided users, comma separated, have the UID specified after '='. e.g. ubuntu=1000,storage=1001"
+  system-additional-groups:
+    type: string
+    default: ""
+    description: "Comma separated list of groups to create. User accounts will not be created"
+  system-gidmap:
+    type: string
+    default: ""
+    description: "Ensure the provided groups, comma separated, have the GID specified after '='. e.g. ubuntu=1000,storage=1001"
+  system-group-membership:
+    type: string
+    default: ""
+    description: "Ensure the users provided, comma separated, are members of the provided groups, colon separated, following '='. e.g. ubuntu=sudo:wheel,storage=storage,sudo"
