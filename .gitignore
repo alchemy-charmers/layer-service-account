@@ -1,4 +1,5 @@
 *.swp
 *.db
 .tox/
+*.pyc
 __pycache__
