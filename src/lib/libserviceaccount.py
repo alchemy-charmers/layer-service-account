@@ -1,4 +1,5 @@
 from charms import layer
+
 from charmhelpers.core import (
     fetch,
     hookenv
