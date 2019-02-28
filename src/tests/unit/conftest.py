@@ -12,17 +12,24 @@ def mock_layers(monkeypatch):
 
     def options(layer):
         # mock options for layers here
-        if layer == 'layer-version':
+        if layer == 'layer-service-account':
+            options = {'users': ['testuser'],
+                       'groups': ['testgroup'],
+                       'uidmap': [{'testuser': 1010}],
+                       'gidmap': [{'testgroup': 1020}],
+                       'membership': [{'testgroup': ['testuser']}]}
+            return options
+        elif layer == 'layer-version':
             options = {'port': 9999}
             return options
         else:
             return None
 
-    monkeypatch.setattr('lib.layer.options', options)
+    monkeypatch.setattr('libserviceaccount.layer.options', options)
 
 
 @pytest.fixture
-def mock_hookenv_config(monkeypatch):
+def mock_hookenv_config(mock_layers, monkeypatch):
     import yaml
 
     def mock_config():
@@ -55,9 +62,9 @@ def mock_charm_dir(monkeypatch):
 
 
 @pytest.fixture
-def libserviceaccount(tmpdir, mock_hookenv_config, mock_charm_dir, monkeypatch):
-    from libserviceaccount import serviceaccountHelper
-    serviceaccount = serviceaccountHelper()
+def libserviceaccount(tmpdir, mock_hookenv_config, mock_charm_dir, mock_layers, monkeypatch):
+    from libserviceaccount import ServiceAccountHelper
+    serviceaccount = ServiceAccountHelper()
 
     # Example config file patching
     cfg_file = tmpdir.join('example.cfg')
@@ -66,6 +73,6 @@ def libserviceaccount(tmpdir, mock_hookenv_config, mock_charm_dir, monkeypatch):
     serviceaccount.example_config_file = cfg_file.strpath
 
     # Any other functions that load the helper will get this version
-    monkeypatch.setattr('libserviceaccount.serviceaccountHelper', lambda: serviceaccount)
+    monkeypatch.setattr('libserviceaccount.ServiceAccountHelper', lambda: serviceaccount)
 
     return serviceaccount

@@ -1,0 +1,8 @@
+#!/usr/local/sbin/charm-env python3
+
+from libserviceaccount import ServiceAccountHelper
+
+sa = ServiceAccountHelper()
+sa.update_accounts()
+
+# vim: filetype=python

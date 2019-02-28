@@ -1,9 +1,7 @@
 from charms import layer
 
-from charmhelpers.core import (
-    fetch,
-    hookenv
-)
+from charmhelpers import fetch
+from charmhelpers.core import hookenv
 from charmhelpers.core.hookenv import (
     status_set,
     log
@@ -17,7 +15,7 @@ from subprocess import (
 class ServiceAccountHelper():
     def __init__(self):
         self.charm_config = hookenv.config()
-        self.layer_config = dict(layer.options('service-account'))
+        self.layer_config = layer.options('service-account')
         self.accounts = []
         self.groups = []
         self.group_membership = []

@@ -10,10 +10,10 @@ serviceaccount = ServiceAccount()
 
 
 # make sure tools are installed
-@when_not('layer-user.installed')
+@when_not('layer-service-account.installed')
 def install_layer_user():
     serviceaccount.install_deps()
-    set_state('layer-user.installed')
+    set_state('layer-service-account.installed')
 
 
 # apply changes to configuration
