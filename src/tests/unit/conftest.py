@@ -62,25 +62,15 @@ def mock_charm_dir(monkeypatch):
 
 @pytest.fixture
 def mock_apt_install(monkeypatch):
-    from charmhelpers import fetch
 
-    def mock_apt_install(package):
-        return True
-
-    monkeypatch.setattr(
-        fetch,
-        'apt_install',
-        mock_apt_install)
-
-
-@pytest.fixture
-def mock_popen(monkeypatch):
-    import subprocess 
+    mocked_apt_install = mock.Mock(
+        returnvalue=True)
 
     monkeypatch.setattr(
-        subprocess,
-        'Popen',
-        mock.MockPopen())
+        'charmhelpers.fetch.apt_install',
+        mocked_apt_install)
+
+    return mocked_apt_install
 
 
 @pytest.fixture
@@ -89,7 +79,6 @@ def libserviceaccount(tmpdir,
                       mock_charm_dir,
                       mock_layers,
                       mock_apt_install,
-                      mock_popen,
                       monkeypatch):
     from libserviceaccount import ServiceAccountHelper
     serviceaccount = ServiceAccountHelper()
