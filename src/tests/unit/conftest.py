@@ -74,11 +74,23 @@ def mock_apt_install(monkeypatch):
 
 
 @pytest.fixture
+def mock_check_call(monkeypatch):
+
+    mocked_check_call = mock.Mock(
+        returnvalue=True)
+
+    monkeypatch.setattr(
+        'subprocess.check_call',
+        mocked_check_call)
+
+
+@pytest.fixture
 def libserviceaccount(tmpdir,
                       mock_hookenv_config,
                       mock_charm_dir,
                       mock_layers,
                       mock_apt_install,
+                      mock_check_call,
                       monkeypatch):
     from libserviceaccount import ServiceAccountHelper
     serviceaccount = ServiceAccountHelper()
