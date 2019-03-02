@@ -16,7 +16,7 @@ class TestLib():
         mock_apt_install.assert_called_once()
         mock_apt_install.assert_called_with('passwd')
 
-    def test_update_accounts(self, libserviceaccount):
+    def test_update_accounts(self, libserviceaccount, mock_check_call):
         libserviceaccount.update_accounts()
         assert isinstance(libserviceaccount.system_passwd, list), "Parsed system passwd db is actually a list"
         assert len(libserviceaccount.system_passwd) > 0, "Parsed system passwd db is not empty"

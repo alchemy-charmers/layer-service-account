@@ -80,8 +80,10 @@ def mock_check_call(monkeypatch):
         returnvalue=True)
 
     monkeypatch.setattr(
-        'subprocess.check_call',
+        'libserviceaccount.check_call',
         mocked_check_call)
+
+    return mocked_check_call
 
 
 @pytest.fixture

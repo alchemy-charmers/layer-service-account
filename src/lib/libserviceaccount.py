@@ -47,13 +47,12 @@ class ServiceAccountHelper():
             group['name'] = fields[0]
             group['id'] = fields[2]
             group['members'] = fields[3].split(',')
-            groups.extend(group)
+            groups.append(group)
         self.system_groups = groups
 
     def check_user_exists(self, user):
         self.parse_passwd()
         for passwd_user in self.system_passwd:
-            print(passwd_user)
             if passwd_user['name'] == user:
                 return True
         return False
@@ -162,7 +161,7 @@ class ServiceAccountHelper():
         self.parse_groups()
         self.parse_passwd()
         for group_entry in self.system_groups:
-            if group_entry['name'] == group:
+            if group_entry == group:
                 if user in group['members']:
                     return True
         return False
@@ -215,7 +214,6 @@ class ServiceAccountHelper():
 
         # add user mapping to self.accounts
         for user in users:
-            print(user)
             if user in user_mapping.keys():
                 self.accounts[user] = user_mapping[user]
             else:
@@ -298,7 +296,7 @@ class ServiceAccountHelper():
                 hookenv.status_set('maintenance', 'Adding account {}'.format(user))
                 log('Added user account {}'.format(user), 'DEBUG')
 
-    def process_groups_memberships(self):
+    def process_group_membership(self):
         # work through group listing, add groups if missing
         hookenv.status_set('maintenance', 'Processing group memberships')
         log('Processing group memberships', 'DEBUG')
@@ -315,8 +313,8 @@ class ServiceAccountHelper():
 
     def process_groups(self):
         # work through groups, updating groups as needed
-        for group in self.group_membership:
-            gid = self.groups(group)
+        for group in self.groups.keys():
+            gid = self.groups[group]
             if self.check_group_exists(group):
                 # check for gid mapping, will return None if no mapping
                 if gid:
@@ -357,5 +355,5 @@ class ServiceAccountHelper():
         self.build_config()
         # apply configuration
         self.apply_config()
-        hookenv.status_set('ready', 'Processed accounts and groups')
+        hookenv.status_set('active', 'Processed accounts and groups')
         return True
