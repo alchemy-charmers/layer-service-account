@@ -119,7 +119,7 @@ class ServiceAccountHelper():
                 else:
                     return True
         return False
-    
+
     def add_group(self, group, gid):
         cmd = []
         if gid:
@@ -185,7 +185,7 @@ class ServiceAccountHelper():
                 'Added group {} for user {}'.format(group, user),
                 'DEBUG'
             )
-        
+
     def build_config(self):
         # read account list
         # this is comma separated

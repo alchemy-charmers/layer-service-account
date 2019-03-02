@@ -1,12 +1,12 @@
 from charms.reactive import (
     when,
     when_not,
-    clear_state,
+    remove_state,
     set_state
 )
-from libserviceaccount import ServiceAccount
+from libserviceaccount import ServiceAccountHelper
 
-serviceaccount = ServiceAccount() 
+serviceaccount = ServiceAccountHelper()
 
 
 # make sure tools are installed
@@ -19,6 +19,6 @@ def install_layer_user():
 # apply changes to configuration
 @when('config.changed')
 def update_accounts():
-    clear_state('layer-service-account.configured')
-    serviceaccount.configure_accounts()
+    remove_state('layer-service-account.configured')
+    serviceaccount.update_accounts()
     set_state('layer-service-account.configured')

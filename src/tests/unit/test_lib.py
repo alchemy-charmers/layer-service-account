@@ -30,7 +30,7 @@ def test_update_accounts(libserviceaccount, mock_check_call):
     assert isinstance(libserviceaccount.system_groups, list), "Parsed system group list is actually a list"
     assert len(libserviceaccount.system_groups) > 0, "Parsed system group list is not empty"
     assert isinstance(libserviceaccount.accounts, dict), "Parsed charm and layer options are a dict"
-    assert len(libserviceaccount.accounts.keys()) > 0, "Parsed charm and layer options groups contain more than one entry"
+    assert len(libserviceaccount.accounts.keys()) > 0, "Parsed charm and layer options groups contains entries"
     assert isinstance(libserviceaccount.groups, dict), "Parsed charm and layer options are a dict"
     assert len(libserviceaccount.groups.keys()) > 0, "Parsed charm and layer options groups contain more than one entry"
 

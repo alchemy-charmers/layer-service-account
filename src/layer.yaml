@@ -1,6 +1,10 @@
 includes:
   - layer:basic
   - layer:version
+repo: git@github.com:pirate-charmers/layer-service-account.git
+options:
+  version:
+    file_name: "repo-info"
 defines:
   users:
     type: array

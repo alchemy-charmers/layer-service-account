@@ -1,8 +1,11 @@
 name: service-account
-summary: Configured local service accounts and groups on behalf of charms 
+summary: Configures local service accounts and groups on behalf of charms 
 maintainer: James Hebden <james@ec0.io>
 description: |
   Used to configure required users and groups for a charm without reinventing the wheel (get it?) each time. Not intended for standalone use, or for interactive users. Users will be created with a null password to prevent interactive login, and will have their shell set to /bin/false.
 tags:
   - misc
+series:
+  - bionic
+  - xenial
 subordinate: false
