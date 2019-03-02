@@ -2,4 +2,5 @@
 *.db
 .tox/
 *.pyc
+.coverage
 __pycache__
