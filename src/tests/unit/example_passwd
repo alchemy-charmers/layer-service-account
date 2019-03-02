@@ -42,3 +42,4 @@ gnome-initial-setup:x:122:65534::/run/gnome-initial-setup/:/bin/false
 gdm:x:123:128:Gnome Display Manager:/var/lib/gdm3:/bin/false
 ubuntu:x:1000:1000:Ubuntu User,,,:/home/ubuntu:/bin/bash
 user:x:1001:1001:Example User,,,:/nonexistent:/bin/false
+testuser:x:1002:1002:Test User,,,::/bin/false

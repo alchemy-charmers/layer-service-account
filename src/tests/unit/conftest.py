@@ -16,8 +16,8 @@ def mock_layers(monkeypatch):
         if layer == 'service-account':
             options = {'users': ['testuser', 'testuser2', 'testuser3'],
                        'groups': ['testgroup', 'testgroup2'],
-                       'uidmap': {'testuser': 1010, 'testuser3': 1030},
-                       'gidmap': {'testgroup': 1020},
+                       'uidmap': {'testuser': 1000, 'testuser3': 1030},
+                       'gidmap': {'testgroup': 1020, 'testgroup2': 1000},
                        'membership': {'testgroup2': ['testuser2', 'testuser3']}
                        }
             return options
@@ -39,8 +39,14 @@ def mock_hookenv_config(mock_layers, monkeypatch):
         for key, value in yml['options'].items():
             cfg[key] = value['default']
 
-        # Manually add cfg from other layers
-        # cfg['my-other-layer'] = 'mock'
+        # for testing full extent of parsing without
+        # having luxurious defaults specified in config.yaml
+        cfg['system-group-membership'] = 'testuser=lxd,testuser2=sudo:lxd'
+        cfg['system-additional-users'] = 'ubuntu,testuser3,testuser4'
+        cfg['system-additional-groups'] = 'besttestgroup,worsttestgroup'
+        cfg['system-uidmap'] = 'testuser3=1000,testuser4=5000,testuser=1006,ubuntu=2000,testuser4=1000,testuser5=1000'
+        cfg['system-gidmap'] = 'besttestgroup=10000,testgroup=1030,testgroup2=1040,ubuntu=2000'
+
         return cfg
 
     monkeypatch.setattr('libserviceaccount.hookenv.config', mock_config)
@@ -76,8 +82,12 @@ def mock_apt_install(monkeypatch):
 @pytest.fixture
 def mock_check_call(monkeypatch):
 
-    mocked_check_call = mock.Mock(
-        returnvalue=True)
+    def print_check_call(args, *, kwargs={}):
+        print(args)
+        return True
+
+    mocked_check_call = mock.Mock()
+    mocked_check_call.get.side_effect = print_check_call
 
     monkeypatch.setattr(
         'libserviceaccount.check_call',
@@ -87,12 +97,25 @@ def mock_check_call(monkeypatch):
 
 
 @pytest.fixture
+def mock_log(monkeypatch):
+
+    mocked_log = mock.Mock()
+
+    monkeypatch.setattr(
+        'libserviceaccount.log',
+        mocked_log)
+
+    return mocked_log
+
+
+@pytest.fixture
 def libserviceaccount(tmpdir,
                       mock_hookenv_config,
                       mock_charm_dir,
                       mock_layers,
                       mock_apt_install,
                       mock_check_call,
+                      mock_log,
                       monkeypatch):
     from libserviceaccount import ServiceAccountHelper
     serviceaccount = ServiceAccountHelper()

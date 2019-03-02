@@ -95,9 +95,9 @@ class ServiceAccountHelper():
 
     def check_uid_conflict(self, user, uid):
         self.parse_passwd()
-        for user in self.system_passwd:
-            if user['id'] == uid:
-                if user['name'] == user:
+        for user_entry in self.system_passwd:
+            if user_entry['id'] == uid:
+                if user_entry['name'] == user:
                     return False
                 else:
                     return True
@@ -225,9 +225,9 @@ class ServiceAccountHelper():
         layer_groups = self.layer_config['groups']
         groups = []
         if config_groups:
-            users.extend(config_groups.split(','))
+            groups.extend(config_groups.split(','))
         if layer_groups:
-            users.extend(layer_groups)
+            groups.extend(layer_groups)
 
         # read GID mapping
         # this is comma separated, group=gid format
@@ -261,7 +261,7 @@ class ServiceAccountHelper():
             membermappings = config_membership.split(',')
             for membermapping in membermappings:
                 if '=' in membermapping:
-                    group, memberlist = gidmapping.split('=')
+                    group, memberlist = membermapping.split('=')
                     members = []
                     if ':' in memberlist:
                         members = memberlist.split(':')
