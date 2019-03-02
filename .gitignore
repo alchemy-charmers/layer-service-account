@@ -5,3 +5,4 @@
 .coverage
 __pycache__
 src/report/*
+src/repo-info
