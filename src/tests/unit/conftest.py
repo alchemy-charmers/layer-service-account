@@ -12,15 +12,14 @@ def mock_layers(monkeypatch):
 
     def options(layer):
         # mock options for layers here
-        if layer == 'layer-service-account':
-            options = {'users': ['testuser'],
-                       'groups': ['testgroup'],
-                       'uidmap': [{'testuser': 1010}],
-                       'gidmap': [{'testgroup': 1020}],
-                       'membership': [{'testgroup': ['testuser']}]}
-            return options
-        elif layer == 'layer-version':
-            options = {'port': 9999}
+        print(layer)
+        if layer == 'service-account':
+            options = {'users': ['testuser', 'testuser2', 'testuser3'],
+                       'groups': ['testgroup', 'testgroup2'],
+                       'uidmap': {'testuser': 1010, 'testuser3': 1030},
+                       'gidmap': {'testgroup': 1020},
+                       'membership': {'testgroup2': ['testuser2', 'testuser3']}
+                       }
             return options
         else:
             return None
@@ -62,15 +61,48 @@ def mock_charm_dir(monkeypatch):
 
 
 @pytest.fixture
-def libserviceaccount(tmpdir, mock_hookenv_config, mock_charm_dir, mock_layers, monkeypatch):
+def mock_apt_install(monkeypatch):
+    from charmhelpers import fetch
+
+    def mock_apt_install(package):
+        return True
+
+    monkeypatch.setattr(
+        fetch,
+        'apt_install',
+        mock_apt_install)
+
+
+@pytest.fixture
+def mock_popen(monkeypatch):
+    import subprocess 
+
+    monkeypatch.setattr(
+        subprocess,
+        'Popen',
+        mock.MockPopen())
+
+
+@pytest.fixture
+def libserviceaccount(tmpdir,
+                      mock_hookenv_config,
+                      mock_charm_dir,
+                      mock_layers,
+                      mock_apt_install,
+                      mock_popen,
+                      monkeypatch):
     from libserviceaccount import ServiceAccountHelper
     serviceaccount = ServiceAccountHelper()
 
-    # Example config file patching
-    cfg_file = tmpdir.join('example.cfg')
-    with open('./tests/unit/example.cfg', 'r') as src_file:
-        cfg_file.write(src_file.read())
-    serviceaccount.example_config_file = cfg_file.strpath
+    passwd_file = tmpdir.join('example_passwd.cfg')
+    with open('./tests/unit/example_passwd', 'r') as src_file:
+        passwd_file.write(src_file.read())
+    serviceaccount.passwd_path = passwd_file.strpath
+
+    group_file = tmpdir.join('example_group.cfg')
+    with open('./tests/unit/example_group', 'r') as src_file:
+        group_file.write(src_file.read())
+    serviceaccount.groups_path = group_file.strpath
 
     # Any other functions that load the helper will get this version
     monkeypatch.setattr('libserviceaccount.ServiceAccountHelper', lambda: serviceaccount)

@@ -16,13 +16,13 @@ class ServiceAccountHelper():
     def __init__(self):
         self.charm_config = hookenv.config()
         self.layer_config = layer.options('service-account')
-        self.accounts = []
-        self.groups = []
-        self.group_membership = []
+        self.accounts = {}
+        self.groups = {}
+        self.group_membership = {}
         self.system_passwd = []
         self.system_groups = []
         self.passwd_path = '/etc/passwd'
-        self.groups_path = '/etc/groups'
+        self.groups_path = '/etc/group'
 
     def install_deps(self):
         fetch.apt_install('passwd')
@@ -35,7 +35,7 @@ class ServiceAccountHelper():
             fields = entry.strip().split(':')
             user['name'] = fields[0]
             user['id'] = fields[2]
-            users.extend(user)
+            users.append(user)
         self.system_passwd = users
 
     def parse_groups(self):
@@ -52,8 +52,9 @@ class ServiceAccountHelper():
 
     def check_user_exists(self, user):
         self.parse_passwd()
-        for user in self.system_passwd:
-            if user['name'] == user:
+        for passwd_user in self.system_passwd:
+            print(passwd_user)
+            if passwd_user['name'] == user:
                 return True
         return False
 
@@ -68,9 +69,8 @@ class ServiceAccountHelper():
         try:
             check_call(cmd)
         except CalledProcessError as e:
-            status_set('ERROR',
-                       'Could not create account {}'.format(user))
             log('Could not create account {}: {}'.format(user, e['message']), 'ERROR')
+            return False
         else:
             log('Created account {}, UID provided: {}'.format(user, uid), 'DEBUG')
 
@@ -194,13 +194,13 @@ class ServiceAccountHelper():
         layer_users = self.layer_config['users']
         users = []
         if config_users:
-            users.append(config_users.split(','))
+            users.extend(config_users.split(','))
         if layer_users:
-            users.append(layer_users)
+            users.extend(layer_users)
 
         # read UID mapping
         # this is comma separated, user=uid format
-        user_mapping = {}
+        user_mapping = dict()
         config_uidmap = self.charm_config['system-uidmap']
         layer_uidmap = self.layer_config['uidmap']
         if config_uidmap:
@@ -215,6 +215,7 @@ class ServiceAccountHelper():
 
         # add user mapping to self.accounts
         for user in users:
+            print(user)
             if user in user_mapping.keys():
                 self.accounts[user] = user_mapping[user]
             else:
@@ -222,13 +223,13 @@ class ServiceAccountHelper():
 
         # read group list
         # this is comma separated
-        config_groups = self.charm_config['system-aditional-groups']
+        config_groups = self.charm_config['system-additional-groups']
         layer_groups = self.layer_config['groups']
         groups = []
         if config_groups:
-            users.append(config_groups.split(','))
+            users.extend(config_groups.split(','))
         if layer_groups:
-            users.append(layer_groups)
+            users.extend(layer_groups)
 
         # read GID mapping
         # this is comma separated, group=gid format
@@ -274,7 +275,7 @@ class ServiceAccountHelper():
     def process_user_accounts(self):
         # work through user listing, add users if missing
         for user in self.accounts:
-            uid = self.accounts(user)
+            uid = self.accounts[user]
             if self.check_user_exists(user):
                 # check for UID mapping, will return None if no mapping
                 if uid:
