@@ -57,23 +57,27 @@ class ServiceAccountHelper():
                 return True
         return False
 
-    def add_user(self, user, uid):
+    def add_user(self, user, uid=False):
         cmd = []
-        if uid:
-            # default to not adding user groups, this can be
-            # done using layer or charm config if needed!
-            cmd = ['useradd', '-N', '-r', '-u', uid, user]
+        if self.check_user_exists(user):
+            if uid:
+                self.set_uid(user, uid)
         else:
-            cmd = ['useradd', '-N', '-r', user]
-        try:
-            check_call(cmd)
-        except CalledProcessError as e:
-            status_set('maintenance',
-                       'Could not create account {}'.format(user))
-            log('Could not create account {}: {}'.format(user, e['message']), 'ERROR')
-            return False
-        else:
-            log('Created account {}, UID provided: {}'.format(user, uid), 'DEBUG')
+            if uid:
+                # default to not adding user groups, this can be
+                # done using layer or charm config if needed!
+                cmd = ['useradd', '-N', '-r', '-u', uid, user]
+            else:
+                cmd = ['useradd', '-N', '-r', user]
+            try:
+                check_call(cmd)
+            except CalledProcessError as e:
+                status_set('maintenance',
+                           'Could not create account {}'.format(user))
+                log('Could not create account {}: {}'.format(user, e.output), 'ERROR')
+                return False
+            else:
+                log('Created account {}, UID provided: {}'.format(user, uid), 'DEBUG')
 
     def set_uid(self, user, uid):
         try:
@@ -87,7 +91,7 @@ class ServiceAccountHelper():
             log('Invalid or in-use UID {} for account {}: {}'.format(
                     uid,
                     user,
-                    e['message']),
+                    e.output),
                 'ERROR')
             return False
         else:
@@ -123,23 +127,27 @@ class ServiceAccountHelper():
                     return True
         return False
 
-    def add_group(self, group, gid):
+    def add_group(self, group, gid=False):
         cmd = []
-        if gid:
-            # default to not adding user groups, this can be
-            # done using layer or charm config if needed!
-            cmd = ['groupadd', '-r', '-g', gid, group]
+        if self.check_group_exists(group):
+            if gid:
+                self.set_gid(group, gid)
         else:
-            cmd = ['groupadd', '-r', group]
-        try:
-            check_call(cmd)
-        except CalledProcessError as e:
-            status_set('maintenance',
-                       'Could not create group {}'.format(group))
-            log('Could not create group {}: {}'.format(group, e['message']), 'ERROR')
-            return False
-        else:
-            log('Created group {}, GID provided: {}'.format(group, gid), 'DEBUG')
+            if gid:
+                # default to not adding user groups, this can be
+                # done using layer or charm config if needed!
+                cmd = ['groupadd', '-r', '-g', gid, group]
+            else:
+                cmd = ['groupadd', '-r', group]
+            try:
+                check_call(cmd)
+            except CalledProcessError as e:
+                status_set('maintenance',
+                           'Could not create group {}'.format(group))
+                log('Could not create group {}: {}'.format(group, e.output), 'ERROR')
+                return False
+            else:
+                log('Created group {}, GID provided: {}'.format(group, gid), 'DEBUG')
 
     def set_gid(self, group, gid):
         try:
@@ -153,7 +161,7 @@ class ServiceAccountHelper():
             log('Invalid or in-use GID {} for group {}: {}'.format(
                     gid,
                     group,
-                    e['message']),
+                    e.output),
                 'ERROR')
             return False
         else:
@@ -183,7 +191,7 @@ class ServiceAccountHelper():
             log('Invalid group {} being added for user {}: {}'.format(
                     group,
                     user,
-                    e['message']),
+                    e.output),
                 'ERROR')
             return False
         else:
