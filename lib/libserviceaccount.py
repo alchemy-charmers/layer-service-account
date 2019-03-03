@@ -58,6 +58,7 @@ class ServiceAccountHelper():
         return False
 
     def add_user(self, user, uid=False):
+        self.parse_passwd()
         cmd = []
         if self.check_user_exists(user):
             if uid:
@@ -80,6 +81,7 @@ class ServiceAccountHelper():
                 log('Created account {}, UID provided: {}'.format(user, uid), 'DEBUG')
 
     def set_uid(self, user, uid):
+        self.parse_passwd()
         try:
             check_call(['usermod', '-u', uid, user])
         except CalledProcessError as e:
@@ -128,6 +130,7 @@ class ServiceAccountHelper():
         return False
 
     def add_group(self, group, gid=False):
+        self.parse_groups()
         cmd = []
         if self.check_group_exists(group):
             if gid:
@@ -150,6 +153,7 @@ class ServiceAccountHelper():
                 log('Created group {}, GID provided: {}'.format(group, gid), 'DEBUG')
 
     def set_gid(self, group, gid):
+        self.parse_groups()
         try:
             check_call(['groupmod', '-g', gid, group])
         except CalledProcessError as e:
@@ -181,7 +185,7 @@ class ServiceAccountHelper():
 
     def add_group_member(self, group, user):
         try:
-            check_call(['usermod', '-A', '-G', group, user])
+            check_call(['usermod', '-a', '-G', group, user])
         except CalledProcessError as e:
             status_set('maintenance',
                        'Invalid group {} being added for user {}'.format(
