@@ -227,8 +227,9 @@ class ServiceAccountHelper():
                     user, uid = uidmapping.split('=')
                     user_mapping[user] = uid
         if layer_uidmap:
-            for user in layer_uidmap.keys():
-                user_mapping[user] = layer_uidmap[user]
+            for uid_slice in layer_uidmap:
+                for user in uid_slice.keys():
+                    user_mapping[user] = uid_slice[user]
 
         # add user mapping to self.accounts
         for user in users:
@@ -259,8 +260,9 @@ class ServiceAccountHelper():
                     group, gid = gidmapping.split('=')
                     group_mapping[group] = gid
         if layer_gidmap:
-            for group in layer_gidmap.keys():
-                group_mapping[group] = layer_gidmap[group]
+            for gid_slice in layer_gidmap:
+                for group in gid_slice.keys():
+                    group_mapping[group] = gid_slice[group]
 
         # add group mapping to self.groups
         for group in groups:

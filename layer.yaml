@@ -13,7 +13,7 @@ defines:
   uidmap:
     type: array
     default: []
-    description: "Ensure the provided users, have the UID specified after '='. e.g. ubuntu=1000, storage=1001"
+    description: "Ensure the provided users, have the UID specified. Array of dicts with ['user'] = uid format"
   groups:
     type: array
     default: []
@@ -21,8 +21,8 @@ defines:
   gidmap:
     type: array
     default: []
-    description: "Ensure the provided groups, have the GID specified after '='. e.g. ubuntu=1000,storage=1001"
+    description: "Ensure the provided groups, have the GID specified. Array of dicts, in ['group'] = gid format"
   membership:
     type: array
     default: []
-    description: "Ensure the users provided, are members of the provided groups, colon separated, following '='. e.g. ubuntu=sudo:wheel, storage=storage,sudo"
+    description: "Ensure the users provided, are members of the provided groups. Array of dicts, in ['group'] = ['user1','user2'] format"
