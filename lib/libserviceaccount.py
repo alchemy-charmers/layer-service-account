@@ -85,7 +85,7 @@ class ServiceAccountHelper():
         try:
             check_call(['usermod', '-u', uid, user])
         except CalledProcessError as e:
-            status_set('maintenace',
+            status_set('maintenance',
                        'Invalid or in-use UID {} for user {} provided'.format(
                            uid,
                            user
