@@ -267,8 +267,9 @@ class ServiceAccountHelper():
                         members = memberlist.split(':')
                     self.group_membership[group] = members
         if layer_membership:
-            for group in layer_membership.keys():
-                self.group_membership[group] = layer_membership[group]
+            for group_slice in layer_membership:
+                for group in group_slice.keys():
+                    self.group_membership[group] = group_slice[group]
 
     def process_user_accounts(self):
         # work through user listing, add users if missing
