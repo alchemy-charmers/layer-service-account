@@ -42,12 +42,13 @@ def test_update_accounts(libserviceaccount, mock_check_call):
         call(['useradd', '-N', '-r', '-u', '1000', 'testuser4']),
         call(['usermod', '-u', 1000, 'testuser']),
         call(['useradd', '-N', '-r', 'testuser2']),
-        call(['groupadd', '-g', '10000', 'besttestgroup']),
-        call(['groupadd', 'worsttestgroup']),
-        call(['groupadd', '-g', 1020, 'testgroup']),
-        call(['groupadd', '-g', 1000, 'testgroup2']),
+        call(['groupadd', '-r', '-g', '10000', 'besttestgroup']),
+        call(['groupadd', '-r', 'worsttestgroup']),
+        call(['groupadd', '-r', '-g', 1020, 'testgroup']),
+        call(['groupadd', '-r', '-g', 1000, 'testgroup2']),
         call(['usermod', '-A', '-G', 'testuser2', 'sudo']),
         call(['usermod', '-A', '-G', 'testuser2', 'lxd']),
         call(['usermod', '-A', '-G', 'testgroup2', 'testuser2']),
-        call(['usermod', '-A', '-G', 'testgroup2', 'testuser3'])])
-    assert mock_check_call.call_count == 13
+        call(['usermod', '-A', '-G', 'testgroup2', 'testuser3']),
+        call(['usermod', '-A', '-G', 'testgroup', 'testuser3'])])
+    assert mock_check_call.call_count == 14

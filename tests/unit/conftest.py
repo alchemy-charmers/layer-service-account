@@ -18,7 +18,8 @@ def mock_layers(monkeypatch):
                        'groups': ['testgroup', 'testgroup2'],
                        'uidmap': {'testuser': 1000, 'testuser3': 1030},
                        'gidmap': {'testgroup': 1020, 'testgroup2': 1000},
-                       'membership': {'testgroup2': ['testuser2', 'testuser3']}
+                       'membership': [{'testgroup2': ['testuser2', 'testuser3']},
+                                      {'testgroup': ['testuser3']}]
                        }
             return options
         else:

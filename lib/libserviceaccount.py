@@ -68,6 +68,8 @@ class ServiceAccountHelper():
         try:
             check_call(cmd)
         except CalledProcessError as e:
+            status_set('maintenance',
+                       'Could not create account {}'.format(user))
             log('Could not create account {}: {}'.format(user, e['message']), 'ERROR')
             return False
         else:
@@ -77,7 +79,7 @@ class ServiceAccountHelper():
         try:
             check_call(['usermod', '-u', uid, user])
         except CalledProcessError as e:
-            status_set('ERROR',
+            status_set('maintenace',
                        'Invalid or in-use UID {} for user {} provided'.format(
                            uid,
                            user
@@ -87,6 +89,7 @@ class ServiceAccountHelper():
                     user,
                     e['message']),
                 'ERROR')
+            return False
         else:
             log(
                 'Set UID {} for account {}'.format(uid, user),
@@ -125,15 +128,16 @@ class ServiceAccountHelper():
         if gid:
             # default to not adding user groups, this can be
             # done using layer or charm config if needed!
-            cmd = ['groupadd', '-g', gid, group]
+            cmd = ['groupadd', '-r', '-g', gid, group]
         else:
-            cmd = ['groupadd', group]
+            cmd = ['groupadd', '-r', group]
         try:
             check_call(cmd)
         except CalledProcessError as e:
-            status_set('ERROR',
+            status_set('maintenance',
                        'Could not create group {}'.format(group))
             log('Could not create group {}: {}'.format(group, e['message']), 'ERROR')
+            return False
         else:
             log('Created group {}, GID provided: {}'.format(group, gid), 'DEBUG')
 
@@ -141,7 +145,7 @@ class ServiceAccountHelper():
         try:
             check_call(['groupmod', '-g', gid, group])
         except CalledProcessError as e:
-            status_set('ERROR',
+            status_set('maintenance',
                        'Invalid or in-use GID {} for group {} provided'.format(
                            gid,
                            group
@@ -151,6 +155,7 @@ class ServiceAccountHelper():
                     group,
                     e['message']),
                 'ERROR')
+            return False
         else:
             log(
                 'Set GID {} for group {}'.format(gid, group),
@@ -170,7 +175,7 @@ class ServiceAccountHelper():
         try:
             check_call(['usermod', '-A', '-G', group, user])
         except CalledProcessError as e:
-            status_set('ERROR',
+            status_set('maintenance',
                        'Invalid group {} being added for user {}'.format(
                            group,
                            user
@@ -180,6 +185,7 @@ class ServiceAccountHelper():
                     user,
                     e['message']),
                 'ERROR')
+            return False
         else:
             log(
                 'Added group {} for user {}'.format(group, user),
@@ -270,6 +276,7 @@ class ServiceAccountHelper():
             for group_slice in layer_membership:
                 for group in group_slice.keys():
                     self.group_membership[group] = group_slice[group]
+        return True
 
     def process_user_accounts(self):
         # work through user listing, add users if missing
@@ -281,10 +288,10 @@ class ServiceAccountHelper():
                     # check for UID conflict
                     if self.check_uid_conflict(user, uid):
                         # another user has this UID, error
-                        hookenv.status_set('error',
+                        hookenv.status_set('maintenance',
                                            'User {} mapped to UID {}, which already exists'.format(
                                                user, uid))
-                        return
+                        return False
                     else:
                         # update account UID
                         hookenv.status_set('maintenance', 'Updating UID for account {} to {}'.format(
@@ -296,6 +303,7 @@ class ServiceAccountHelper():
                 self.add_user(user, uid)
                 hookenv.status_set('maintenance', 'Adding account {}'.format(user))
                 log('Added user account {}'.format(user), 'DEBUG')
+        return True
 
     def process_group_membership(self):
         # work through group listing, add groups if missing
@@ -311,6 +319,7 @@ class ServiceAccountHelper():
                     self.add_group_member(group, user)
                     hookenv.status_set('maintenance', 'Adding group member {} to {}'.format(user, group))
                     log('Added group member {} to {}'.format(user, group), 'DEBUG')
+        return True
 
     def process_groups(self):
         # work through groups, updating groups as needed
@@ -322,10 +331,12 @@ class ServiceAccountHelper():
                     # check for gid conflict
                     if self.check_gid_conflict(group, gid):
                         # another group has this gid, error
-                        hookenv.status_set('error',
-                                           'Group {} mapped to gid {}, which already exists'.format(
+                        hookenv.status_set('maintenance',
+                                           'group {} mapped to gid {}, which already exists'.format(
                                                group, gid))
-                        return
+                        hookenv.log('Group {} mapped to gid {}, which already exists'.format(
+                                               group, gid), 'ERROR')
+                        return False
                     else:
                         # update account gid
                         hookenv.status_set('maintenance', 'Updating gid for group {} to {}'.format(
@@ -337,6 +348,7 @@ class ServiceAccountHelper():
                 self.add_group(group, gid)
                 hookenv.status_set('maintenance', 'Adding group {}'.format(group))
                 log('Added group account {}'.format(group), 'DEBUG')
+        return True
 
     def apply_config(self):
         # loop over account and ensure they exist with correct UIDs
